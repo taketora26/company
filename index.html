@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TigerWorks Inc.</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #000;
+            color: white;
+            padding: 40px 20px 20px;
+            text-align: center;
+            position: relative;
+        }
+        header img {
+            width: 180px;
+            height: auto;
+            position: relative;
+            top: 20px;
+        }
+        header h1 {
+            margin-top: -10px;
+            font-size: 2em;
+            position: relative;
+            z-index: 1;
+        }
+        section {
+            max-width: 800px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+        h2 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        footer {
+            background-color: #f2f2f2;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <img src="./logo.png" alt="Tiger Logo" />
+    <h1>TigerWorks Inc.</h1>
+</header>
+
+<section id="about">
+    <h2>会社概要</h2>
+    <p>
+        TigerWorks Inc.は、資産管理法人としてアパートや古民家などの再生および運営を行っています。
+        代表自らが手を動かし、老朽化した物件を丁寧にリノベーションし、不動産賃貸事業を通じて新たな価値を創出しています。
+        住まい手にとって安心で快適な暮らしを提供し、地域の再生にも貢献することを目指しています。
+    </p>
+</section>
+
+<section>
+    <h2>会社情報</h2>
+    <p><strong>会社名：</strong>株式会社TigerWorks</p>
+    <p><strong>設立日：</strong>2025年6月4日</p>
+    <p><strong>事業内容：</strong>不動産賃貸業</p>
+</section>
+
+
+<footer>
+    © <span id="year"></span> TigerWorks Inc.
+</footer>
+
+<script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

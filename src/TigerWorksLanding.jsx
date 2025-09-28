@@ -307,7 +307,6 @@ export default function TigerWorksLanding() {
             <ul className="mt-3 text-sm list-disc pl-5 space-y-2 text-neutral-700">
               <li>{t("代表が現場に入り、意思決定から施工まで一貫", "Founder-led, hands-on from decision to build")}</li>
               <li>{t("DIYと専門工事の最適配分でコスト最適化", "Optimize cost via DIY + pro mix")}</li>
-              <li>{t("行政・金融機関・地域との調整力", "Coordination with authorities, banks, community")}</li>
               <li>
                 {t(
                   "和室を単に洋室化せず、木部・建具・左官など既存素材を活かす設計",

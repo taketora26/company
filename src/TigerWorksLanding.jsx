@@ -44,7 +44,7 @@ export default function TigerWorksLanding() {
     },
     {
       src: asset("/works/Interior_coordinator.jpg"),
-      title: t("インテリアコーディネートの事例", "Interior coordination examples"),
+      title: t("ステージングの事例", "Interior coordination examples"),
     },
   ];
 

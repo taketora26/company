@@ -283,9 +283,7 @@ const works = [
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold">{t('Message / 代表挨拶', 'Message')}</h2>
             <p className="mt-4 text-neutral-700 text-sm leading-7">
-              {t('私は佐賀県伊万里市出身で、男5人兄弟の4男として育ちました。私が生まれる5年前に建てられた実家は、今も手入れが行き届き自慢の家です。だからこそ、古い家も手をかければ、かつての美しさと新しい使いやすさを取り戻せると信じています。いま日本各地で空き家が増える中、古民家の良さを活かし、次の世代へ引き継げる住まいへ再生していきます。',
-                  "I’m from Imari City in Saga Prefecture, the fourth of five brothers, and I grew up in this house. Our family home was built five years before I was born and is still carefully maintained—a home I’m proud of. That is why I believe older houses, when cared for, can regain their former beauty while becoming easier to live in. As vacant homes increase across Japan, I want to bring out the best of traditional houses and restore them into homes that can be passed on to the next generation."
-              )}
+              {t('古くても丁寧に手入れされてきた家には、静かな品と温かさがあります。私の実家も、私が生まれる5年前に建てられた家ですが、今も手入れが行き届き、誇れる存在です。だからこそ、古い家は手をかければ、かつての美しさと現代の使いやすさを取り戻せると信じています。空き家が増える今、古民家の良さを活かし、次の世代へ安心して受け渡せる住まいへと再生していきます。', "Even when a building is old, a home that has been well cared for carries a quiet dignity and warmth. My own family house—built five years before I was born—remains carefully maintained and is a source of pride. This is why I believe that with thoughtful work, older houses can regain their original beauty while meeting modern needs. As vacant homes increase across Japan, I aim to revive traditional houses so they can be passed on with confidence to the next generation.")}
             </p>
             <div className="mt-4 text-sm text-neutral-700 italic">
               {t('代表取締役　池田 健虎', 'Taketo Ikeda, Representative Director')}

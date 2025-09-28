@@ -7,10 +7,6 @@ npm start
 ```
 
 
-```shell
- % npx -y react-scripts@5.0.1 start
-```
-
 If Tailwind styles don't apply, run `npm i -D tailwindcss postcss autoprefixer` again.
 
 ## Build

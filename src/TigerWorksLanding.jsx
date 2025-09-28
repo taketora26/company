@@ -141,7 +141,7 @@ export default function TigerWorksLanding() {
             </div>
             <div className="aspect-[4/3] rounded-3xl shadow-sm bg-neutral-200 overflow-hidden">
               <img
-                src={asset("/works/work2.jpg")}
+                src={asset("/works/work2.jpeg")}
                 alt={t("作業風景", "On-site work")}
                 className="w-full h-full object-cover"
               />
@@ -323,7 +323,7 @@ export default function TigerWorksLanding() {
       <section id="message" className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-center">
           <div className="aspect-[4/3] rounded-3xl overflow-hidden bg-neutral-200">
-            <img src={asset("/works/IMG_8614_1.jpg")} alt="Founder" className="w-full h-full object-cover" />
+            <img src={asset("/works/IMG_8614_1.jpeg")} alt="Founder" className="w-full h-full object-cover" />
           </div>
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold">{t("Message / 代表挨拶", "Message")}</h2>

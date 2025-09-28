@@ -15,16 +15,16 @@ export default function TigerWorksLanding() {
 
   // 作品データ（今の配列をそのまま使ってOK）
   const works = [
-    { src: "/works/living_renovation.jpg",
+    { src: {`${process.env.PUBLIC_URL}/works/living_renovation.jpg`},
       title: t('リビング リノベーション事例','Living Room Renovation'),
       note: t('東京都あきる野市古民家（築50年）','Traditional house in Akiruno, Tokyo (50 years old)') },
-    { src: "/works/japanese_room.jpg",
+    { src: {`${process.env.PUBLIC_URL}/works/japanese_room.jpg`},
       title: t('和室のリノベーション事例','Japanese Room Renovation'),
       note: t('埼玉県熊谷市古民家（築64年）','Traditional house in Kumagaya, Saitama (64 years old)') },
-    { src: "/works/kitchen.jpg",
+    { src: {`${process.env.PUBLIC_URL}/works/kitchen.jpg`},
       title: t('キッチンのリノベーション事例','Kitchen Renovation'),
       note: t('埼玉県熊谷市古民家（築64年）','Traditional house in Kumagaya, Saitama (64 years old)') },
-    { src: "/works/Interior_coordinator.jpg",
+    { src: {`${process.env.PUBLIC_URL}/works/Interior_coordinator.jpg`},
       title: t('インテリアコーディネートの事例','Interior coordination examples') },
   ];
 
@@ -54,7 +54,7 @@ export default function TigerWorksLanding() {
       <header className="sticky top-0 z-50 backdrop-blur bg-white/80 border-b border-neutral-100">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <a href="#top" className="flex items-center gap-3">
-            <img src="/works/logo.png" alt={t('TigerWorksロゴ','TigerWorks logo')} className="w-9 h-9 rounded-md object-contain" />
+            <img src={`${process.env.PUBLIC_URL}/works/logo.png`} alt={t('TigerWorksロゴ','TigerWorks logo')} className="w-9 h-9 rounded-md object-contain" />
             <span className="font-semibold">TigerWorks Inc.</span>
           </a>
           <nav className="hidden md:flex items-center gap-6">
@@ -114,7 +114,7 @@ export default function TigerWorksLanding() {
               </div>
             </div>
             <div className="aspect-[4/3] rounded-3xl shadow-sm bg-neutral-200 overflow-hidden">
-              <img src="/works/work2.jpg" alt="Renovated interior" className="w-full h-full object-cover" />
+              <img src={`${process.env.PUBLIC_URL}/works/work2.jpg`}  alt="Renovated interior" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
@@ -265,7 +265,7 @@ export default function TigerWorksLanding() {
       <section id="message" className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-center">
           <div className="aspect-[4/3] rounded-3xl overflow-hidden bg-neutral-200">
-            <img src="/works/IMG_8614_1.jpg" alt="Founder" className="w-full h-full object-cover" />
+           <img src={`${process.env.PUBLIC_URL}/works/IMG_8614_1.jpg`} alt="Founder" className="w-full h-full object-cover" />
           </div>
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold">{t('Message / 代表挨拶', 'Message')}</h2>

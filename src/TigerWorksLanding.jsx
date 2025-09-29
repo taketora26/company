@@ -44,7 +44,11 @@ export default function TigerWorksLanding() {
     },
     {
       src: asset("/works/Interior_coordinator.jpg"),
-      title: t("ステージングの事例", "Interior coordination examples"),
+      title: t("マンション売却のステージング事例", "Interior coordination examples"),
+      note: t(
+        "東京都杉並区マンション（築4年）",
+        "Apartment in Suginami, Tokyo (4 years old)"
+      ),
     },
   ];
 

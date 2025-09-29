@@ -27,7 +27,7 @@ export default function TigerWorksLanding() {
       ),
     },
     {
-      src: asset("/works/japanese_room.jpg"),
+      src: asset("/works/japanese_room2.jpg"),
       title: t("和室のリノベーション事例", "Japanese Room Renovation"),
       note: t(
         "埼玉県熊谷市古民家（築64年）",
@@ -183,8 +183,8 @@ export default function TigerWorksLanding() {
               {
                 title: t("宿泊事業（旅館業／住宅宿泊）", "Hospitality (Ryokan / Minpaku)"),
                 desc: t(
-                  "行政協議、消防・保健所対応、運営設計、OTA掲載・運用まで。",
-                  "Permits coordination, fire/health compliance, operations design, OTA listing & operations."
+                  "運営設計、OTA掲載・運用まで。",
+                  "Operations design, OTA listing & operations."
                 ),
               },
               {

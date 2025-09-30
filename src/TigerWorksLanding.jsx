@@ -332,8 +332,8 @@ export default function TigerWorksLanding() {
             <h2 className="text-2xl sm:text-3xl font-bold">{t("Message / 代表挨拶", "Message")}</h2>
             <p className="mt-4 text-neutral-700 text-sm leading-7">
               {t(
-                "古くても丁寧に手入れされてきた家には、静かな品と温かさがあります。私の実家も、私が生まれる5年前に建てられた家ですが、今も手入れが行き届き、誇れる存在です。だからこそ、古い家は手をかければ、かつての美しさと現代の使いやすさを取り戻せると信じています。空き家が増える今、古民家の良さを活かし、次の世代へ安心して受け渡せる住まいへと再生していきます。",
-                "Even when a building is old, a home that has been well cared for carries a quiet dignity and warmth. My own family house—built five years before I was born—remains carefully maintained and is a source of pride. This is why I believe that with thoughtful work, older houses can regain their original beauty while meeting modern needs. As vacant homes increase across Japan, I aim to revive traditional houses so they can be passed on with confidence to the next generation."
+                "古くても丁寧に手入れされてきた家には、静かな品と温かさがあります。私が生まれ育った実家は築40年以上ですが、今も手入れが行き届き、凛とした佇まいを保っています。相続された古い家が、十分にメンテナンスされず本来の魅力を発揮できていない場面に多く出会います。けれど、骨格のしっかりした家は、手をかければ、かつての美しさと現代の使い心地を取り戻せます。空き家が増える今、私たちは古民家の素材と技を活かし、次の世代へ安心して受け渡せる住まいへ丁寧に再生していきます。",
+                "Homes that have been carefully maintained—even as they age—carry a quiet dignity and warmth. The house I grew up in is now over forty years old, yet it remains well kept and proudly stands.I often see inherited older homes whose potential goes untapped for lack of maintenance. When a house has good bones, thoughtful work can restore its original beauty while updating it for modern living.As vacant homes increase across Japan, we honor the materials and craftsmanship of traditional houses and restore them so they can be passed on with confidence to the next generation."
               )}
             </p>
             <div className="mt-4 text-sm text-neutral-700 italic">

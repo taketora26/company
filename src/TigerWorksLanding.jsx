@@ -75,7 +75,16 @@ export default function TigerWorksLanding() {
       <header className="sticky top-0 z-50 backdrop-blur bg-white/80 border-b border-neutral-100">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <a href="#top" className="flex items-center gap-1">
-            <img src={asset('/works/logo.png')} alt={t('TigerWorksロゴ','TigerWorks logo')} className="w-12 h-12 rounded-md object-contain" />
+              <picture className="block">
+                <source media="(max-width: 767px)" srcSet={asset('/works/logo_silver_bright.png')} />
+                <img
+                  src={asset('/works/logo.png')}
+                  alt={t('TigerWorksロゴ','TigerWorks logo')}
+                  className="w-12 h-12 rounded-md object-contain"
+                  loading="eager"
+                  decoding="async"
+                />
+              </picture>
             <span className="font-semibold">TigerWorks Inc.</span>
           </a>
           <nav className="hidden md:flex items-center gap-6">

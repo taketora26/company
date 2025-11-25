@@ -375,7 +375,7 @@ export default function TigerWorksLanding() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <FadeIn>
                 <div className="relative aspect-[3/4] md:aspect-[4/5] rounded-2xl overflow-hidden shadow-xl">
-                  <img src={asset("/works/IMG_8613_1.jpg")} alt="Taketo Ikeda" className="w-full h-full object-cover" />
+                  <img src={asset("/works/IMG_8612_1_resize.jpg")} alt="Taketo Ikeda" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:hidden"></div>
                   <div className="absolute bottom-6 left-6 text-white md:hidden">
                     <div className="text-xs opacity-80 mb-1">{t("代表取締役", "CEO")}</div>

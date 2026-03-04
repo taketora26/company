@@ -1,4 +1,4 @@
-# TigerWorks (CRA + Tailwind) — Minimal Project
+# TigerWorks
 
 ## Setup
 ```bash

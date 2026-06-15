@@ -4,40 +4,73 @@ import { useState, useEffect, useRef } from "react";
 
 const BeforeAfterSlider = ({ before, after, alt }) => {
   const [sliderPosition, setSliderPosition] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
-  const handleMove = (clientX) => {
+  const moveTo = (clientX) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    const percent = (x / rect.width) * 100;
-    setSliderPosition(percent);
+    setSliderPosition((x / rect.width) * 100);
   };
 
-  const onMouseMove = (e) => handleMove(e.clientX);
-  const onTouchMove = (e) => handleMove(e.touches[0].clientX);
+  const onPointerDown = (e) => {
+    setIsDragging(true);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    moveTo(e.clientX);
+  };
+  const onPointerMove = (e) => {
+    if (isDragging) moveTo(e.clientX);
+  };
+  const stopDragging = () => setIsDragging(false);
+
+  const onKeyDown = (e) => {
+    if (e.key === "ArrowLeft") {
+      setSliderPosition((p) => Math.max(0, p - 5));
+      e.preventDefault();
+    } else if (e.key === "ArrowRight") {
+      setSliderPosition((p) => Math.min(100, p + 5));
+      e.preventDefault();
+    } else if (e.key === "Home") {
+      setSliderPosition(0);
+      e.preventDefault();
+    } else if (e.key === "End") {
+      setSliderPosition(100);
+      e.preventDefault();
+    }
+  };
 
   return (
-    <div 
+    <div
       ref={containerRef}
-      className="relative w-full aspect-[4/3] sm:aspect-video overflow-hidden rounded-2xl select-none cursor-ew-resize shadow-lg"
-      onMouseMove={onMouseMove}
-      onTouchMove={onTouchMove}
+      role="slider"
+      tabIndex={0}
+      aria-label={`Before / After: ${alt}`}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(sliderPosition)}
+      aria-valuetext={`Before ${Math.round(sliderPosition)}%`}
+      className={`relative w-full aspect-[4/3] sm:aspect-video overflow-hidden rounded-2xl select-none touch-none shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900 ${isDragging ? "cursor-ew-resize" : "cursor-grab"}`}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={stopDragging}
+      onPointerCancel={stopDragging}
+      onKeyDown={onKeyDown}
     >
       {/* After Image (Base) */}
-      <img src={after} alt={`After: ${alt}`} className="absolute inset-0 w-full h-full object-cover" />
-      
+      <img src={after} alt={`After: ${alt}`} loading="lazy" decoding="async" draggable={false} className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+
       {/* Before Image (Overlay) */}
-      <div 
+      <div
         className="absolute inset-0 w-full h-full overflow-hidden"
         style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
       >
-        <img src={before} alt={`Before: ${alt}`} className="absolute inset-0 w-full h-full object-cover max-w-none" />
+        <img src={before} alt={`Before: ${alt}`} loading="lazy" decoding="async" draggable={false} className="absolute inset-0 w-full h-full object-cover max-w-none pointer-events-none" />
       </div>
 
       {/* Slider Handle */}
-      <div 
-        className="absolute top-0 bottom-0 w-0.5 bg-white z-10"
+      <div
+        className="absolute top-0 bottom-0 w-0.5 bg-white z-10 pointer-events-none"
         style={{ left: `${sliderPosition}%` }}
       >
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-neutral-900 rounded-full p-2 shadow-xl border border-neutral-100">
@@ -105,8 +138,8 @@ export default function TigerWorksLanding() {
   const works = [
     {
       type: "comparison",
-      before: asset("/works/japanese_room_before.jpg"),
-      after: asset("/works/japanese_room2.jpg"),
+      before: asset("/works/japanese_room_before.webp"),
+      after: asset("/works/japanese_room2.webp"),
       title: t("古民家 和室リノベーション", "Traditional Room Renovation"),
       location: t("埼玉県熊谷市（築64年）", "Kumagaya, Saitama (64y)"),
       desc: t(
@@ -116,8 +149,8 @@ export default function TigerWorksLanding() {
     },
     {
       type: "comparison",
-      before: asset("/works/living_before.jpg"),
-      after: asset("/works/living_renovation.jpg"),
+      before: asset("/works/living_before.webp"),
+      after: asset("/works/living_renovation.webp"),
       title: t("リビング リノベーション", "Living Room Renovation"),
       location: t("東京都あきる野市（築50年）", "Akiruno, Tokyo (50y)"),
       desc: t(
@@ -127,7 +160,7 @@ export default function TigerWorksLanding() {
     },
     {
       type: "single",
-      src: asset("/works/kitchen.jpg"),
+      src: asset("/works/kitchen.webp"),
       title: t("キッチン リノベーション", "Kitchen Renovation"),
       location: t("埼玉県熊谷市（築64年）", "Kumagaya, Saitama (64y)"),
       desc: t(
@@ -137,7 +170,7 @@ export default function TigerWorksLanding() {
     },
     {
       type: "single",
-      src: asset("/works/Interior_coordinator.jpg"),
+      src: asset("/works/Interior_coordinator.webp"),
       title: t("マンション ステージング", "Apartment Staging"),
       location: t("東京都杉並区（築4年）", "Suginami, Tokyo (4y)"),
       desc: t(
@@ -155,7 +188,7 @@ export default function TigerWorksLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           <a href="#top" className="flex items-center gap-3 group">
             <img
-              src={asset('/works/logo.png')}
+              src={asset('/works/logo.webp')}
               alt="TigerWorks Logo"
               className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-contain transition-transform group-hover:scale-105"
             />
@@ -169,6 +202,14 @@ export default function TigerWorksLanding() {
                 {n.label}
               </a>
             ))}
+            <a
+              href="https://tiger-house-hp.web.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 text-sm font-medium bg-neutral-900 text-white rounded-full hover:bg-neutral-700 transition-colors"
+            >
+              {t("民泊予約", "Stay")}
+            </a>
             <div className="w-px h-4 bg-neutral-300 mx-2"></div>
             <div className="flex items-center gap-1 bg-neutral-100 p-1 rounded-lg">
               <button onClick={() => setLang('ja')} className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${lang==='ja'?'bg-white shadow text-neutral-900':'text-neutral-500 hover:text-neutral-900'}`}>JA</button>
@@ -195,6 +236,14 @@ export default function TigerWorksLanding() {
                 </a>
               ))}
               <div className="h-px bg-neutral-100 my-1"></div>
+              <a
+                href="https://tiger-house-hp.web.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 text-sm font-medium text-center bg-neutral-900 text-white rounded-lg hover:bg-neutral-700 transition-colors"
+              >
+                {t("民泊予約（Tiger House）", "Stay (Tiger House)")}
+              </a>
               <div className="flex justify-center gap-2 p-2">
                 <button onClick={() => setLang('ja')} className={`px-3 py-1 text-xs font-medium rounded-md ${lang==='ja'?'bg-neutral-900 text-white':'bg-neutral-100 text-neutral-600'}`}>JA</button>
                 <button onClick={() => setLang('en')} className={`px-3 py-1 text-xs font-medium rounded-md ${lang==='en'?'bg-neutral-900 text-white':'bg-neutral-100 text-neutral-600'}`}>EN</button>
@@ -211,9 +260,11 @@ export default function TigerWorksLanding() {
         <section id="top" className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-neutral-900">
           {/* Background Image with Overlay */}
           <div className="absolute inset-0 z-0">
-            <img 
-              src={asset("/works/work2.jpeg")} 
-              alt="Hero Background" 
+            <img
+              src={asset("/works/work2.webp")}
+              alt="Hero Background"
+              fetchpriority="high"
+              decoding="async"
               className="w-full h-full object-cover opacity-60"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-neutral-900"></div>
@@ -284,31 +335,45 @@ export default function TigerWorksLanding() {
                   desc: t("古民家や築古アパートの魅力を引き出す設計。DIYと専門工事を組み合わせたハイブリッド施工でコストパフォーマンスを追求。", "Designing to highlight the charm of old homes. Hybrid construction mixing DIY and pro works for cost performance.")
                 },
                 {
-                  icon: "💡",
-                  title: t("古民家再生コンサルティング", "Revitalization Consulting"),
-                  desc: t("現地調査、事業収支計画の策定、補助金活用のご提案まで。空き家対策や地域の活性化に貢献します。", "Site surveys, business planning, and subsidy proposals. Contributing to vacant home solutions and regional revitalization.")
+                  icon: "🏠",
+                  title: t("民泊・簡易宿所の立ち上げ", "Guesthouse Launch"),
+                  desc: t("物件選定・事業収支計画から、旅館業・住宅宿泊事業の許認可申請、宿としての設計・内装まで。ゼロから収益施設をワンストップで立ち上げます。", "From property selection and business planning to licensing (ryokan/minpaku permits) and guest-ready design. Launching revenue facilities from scratch, all in one stop.")
                 },
                 {
-                  icon: "🏨",
-                  title: t("宿泊事業（民泊・旅館）", "Hospitality Business"),
-                  desc: t("簡易宿所や民泊の企画・立ち上げ・運営代行。インバウンド需要を取り込んだ高収益な運用をご提案。", "Planning, launching, and operating guesthouses. High-yield operations targeting inbound tourism.")
+                  icon: "🛎",
+                  title: t("民泊運営代行", "Guesthouse Operations"),
+                  desc: t("予約・ゲスト対応・清掃手配・料金調整・各種予約サイト運用まで運営を代行。自社施設で培ったノウハウで稼働率と収益を最大化します。", "Full operation on your behalf—bookings, guest support, cleaning, dynamic pricing, and OTA management. Maximizing occupancy with our hands-on know-how."),
+                  link: { url: "https://tiger-house-hp.web.app/", label: t("運営施設「Tiger House Kusabana」を見る", "Visit our facility: Tiger House Kusabana") }
+                },
+                {
+                  icon: "🌿",
+                  title: t("古民家活用・再生", "Vacant Home Revitalization"),
+                  desc: t("相続した空き家や使われていない古民家を、現地調査・補助金活用・収益化プランのご提案で再生。地域に根ざした活用をサポートします。", "Revitalizing inherited vacant homes and unused traditional houses through site surveys, subsidy utilization, and monetization plans rooted in the community.")
                 },
                 {
                   icon: "🛋",
                   title: t("空間デザイン・スタイリング", "Interior Styling"),
                   desc: t("内装材の選定から家具・インテリアのコーディネートまで。物件のコンセプトに合わせた魅力的な空間を演出。", "Selection of finishes and furniture coordination. Creating attractive spaces that match the property concept.")
-                },
-                {
-                  icon: "🤝",
-                  title: t("不動産活用相談", "Real Estate Advisory"),
-                  desc: t("相続した空き家や、稼働率の低いアパートの活用方法など、不動産に関するお悩みを解決します。", "Solving real estate issues, such as inherited vacant homes or low-occupancy apartments.")
                 }
               ].map((service, i) => (
                 <FadeIn key={i} delay={i * 100}>
-                  <div className="h-full p-8 rounded-2xl bg-neutral-50 hover:bg-white border border-neutral-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="h-full p-8 rounded-2xl bg-neutral-50 hover:bg-white border border-neutral-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col">
                     <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300 inline-block">{service.icon}</div>
                     <h3 className="font-serif text-xl font-semibold mb-3">{service.title}</h3>
                     <p className="text-neutral-600 text-sm leading-relaxed">{service.desc}</p>
+                    {service.link && (
+                      <a
+                        href={service.link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-neutral-900 hover:gap-2 transition-all"
+                      >
+                        {service.link.label}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                        </svg>
+                      </a>
+                    )}
                   </div>
                 </FadeIn>
               ))}
@@ -350,7 +415,7 @@ export default function TigerWorksLanding() {
                         <BeforeAfterSlider before={work.before} after={work.after} alt={work.title} />
                       ) : (
                         <div className="rounded-2xl overflow-hidden shadow-lg aspect-[4/3] sm:aspect-video group">
-                          <img src={work.src} alt={work.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                          <img src={work.src} alt={work.title} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                         </div>
                       )}
                       <div>
@@ -375,7 +440,7 @@ export default function TigerWorksLanding() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <FadeIn>
                 <div className="relative aspect-[3/4] md:aspect-[4/5] rounded-2xl overflow-hidden shadow-xl">
-                  <img src={asset("/works/IMG_8612_1_resize.jpg")} alt="Taketo Ikeda" className="w-full h-full object-cover" />
+                  <img src={asset("/works/IMG_8612_1_resize.webp")} alt="Taketo Ikeda" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:hidden"></div>
                   <div className="absolute bottom-6 left-6 text-white md:hidden">
                     <div className="text-xs opacity-80 mb-1">{t("代表取締役", "CEO")}</div>
@@ -472,6 +537,19 @@ export default function TigerWorksLanding() {
                   読み込んでいます…
                 </iframe>
               </div>
+
+              <p className="mt-8 text-sm text-neutral-600">
+                {t("フォームが表示されない場合は、メールでもお気軽にどうぞ。", "If the form doesn't load, feel free to email us directly.")}
+              </p>
+              <a
+                href="mailto:info@tiger-works.jp"
+                className="mt-2 inline-flex items-center gap-2 text-neutral-900 font-medium hover:gap-3 transition-all"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+                info@tiger-works.jp
+              </a>
             </FadeIn>
           </div>
         </section>
@@ -482,7 +560,7 @@ export default function TigerWorksLanding() {
       <footer className="bg-neutral-900 text-white py-12 border-t border-neutral-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
-            <img src={asset('/works/logo_silver_bright.png')} alt="Logo" className="w-8 h-8 object-contain" />
+            <img src={asset('/works/logo_silver_bright.webp')} alt="Logo" loading="lazy" decoding="async" className="w-8 h-8 object-contain" />
             <span className="font-serif font-bold tracking-wide">TigerWorks Inc.</span>
           </div>
           <div className="text-xs text-neutral-500">

@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from "react";
 
 // --- Components ---
 
-const BeforeAfterSlider = ({ before, after, alt }) => {
+const BeforeAfterSlider = ({ before, after, alt, hint }) => {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
+  const [showHint, setShowHint] = useState(true);
   const containerRef = useRef(null);
 
   const moveTo = (clientX) => {
@@ -16,6 +17,7 @@ const BeforeAfterSlider = ({ before, after, alt }) => {
 
   const onPointerDown = (e) => {
     setIsDragging(true);
+    setShowHint(false);
     e.currentTarget.setPointerCapture?.(e.pointerId);
     moveTo(e.clientX);
   };
@@ -25,6 +27,7 @@ const BeforeAfterSlider = ({ before, after, alt }) => {
   const stopDragging = () => setIsDragging(false);
 
   const onKeyDown = (e) => {
+    setShowHint(false);
     if (e.key === "ArrowLeft") {
       setSliderPosition((p) => Math.max(0, p - 5));
       e.preventDefault();
@@ -83,6 +86,13 @@ const BeforeAfterSlider = ({ before, after, alt }) => {
       {/* Labels */}
       <div className="absolute top-4 left-4 bg-black/50 text-white text-xs px-2 py-1 rounded backdrop-blur-sm pointer-events-none">Before</div>
       <div className="absolute top-4 right-4 bg-black/50 text-white text-xs px-2 py-1 rounded backdrop-blur-sm pointer-events-none">After</div>
+
+      {/* Mobile drag hint */}
+      {showHint && hint && (
+        <div className="lg:hidden absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm pointer-events-none animate-pulse whitespace-nowrap">
+          {hint}
+        </div>
+      )}
     </div>
   );
 };
@@ -118,9 +128,109 @@ const FadeIn = ({ children, className = "", delay = 0 }) => {
   );
 };
 
+// --- Service Icons (lucide-style stroke icons, no external dependency) ---
+const ICON_PATHS = {
+  building: (
+    <>
+      <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+      <path d="M9 22v-4h6v4" />
+      <path d="M8 6h.01" /><path d="M12 6h.01" /><path d="M16 6h.01" />
+      <path d="M8 10h.01" /><path d="M12 10h.01" /><path d="M16 10h.01" />
+      <path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" />
+    </>
+  ),
+  hammer: (
+    <>
+      <path d="m15 12-8.5 8.5a2.12 2.12 0 1 1-3-3L12 9" />
+      <path d="M17.64 15 22 10.64" />
+      <path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h.86c.85 0 1.65.33 2.25.93l1.25 1.25" />
+    </>
+  ),
+  clipboard: (
+    <>
+      <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="m9 14 2 2 4-4" />
+    </>
+  ),
+  bell: (
+    <>
+      <path d="M3 20a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1Z" />
+      <path d="M20 16a8 8 0 1 0-16 0" />
+      <path d="M12 4v4" />
+      <path d="M10 4h4" />
+    </>
+  ),
+  sprout: (
+    <>
+      <path d="M7 20h10" />
+      <path d="M10 20c5.5-2.5.8-6.4 3-10" />
+      <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z" />
+      <path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z" />
+    </>
+  ),
+  sofa: (
+    <>
+      <path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3" />
+      <path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0Z" />
+      <path d="M4 18v2" />
+      <path d="M20 18v2" />
+      <path d="M12 4v9" />
+    </>
+  ),
+};
+
+const ServiceIcon = ({ name }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-6 h-6"
+    aria-hidden="true"
+  >
+    {ICON_PATHS[name]}
+  </svg>
+);
+
 export default function TigerWorksLanding() {
-  const [lang, setLang] = useState("ja");
+  const [lang, setLang] = useState(() => {
+    if (typeof window === "undefined") return "ja";
+    return localStorage.getItem("tw-lang") === "en" ? "en" : "ja";
+  });
   const t = (ja, en) => (lang === "ja" ? ja : en);
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    try {
+      localStorage.setItem("tw-lang", lang);
+    } catch (e) {
+      /* localStorage unavailable (private mode等) */
+    }
+  }, [lang]);
+
+  // モバイル固定CTA: ヒーロー/お問い合わせが見えている間は非表示
+  const [showMobileCTA, setShowMobileCTA] = useState(false);
+  useEffect(() => {
+    const hero = document.getElementById("top");
+    const contact = document.getElementById("contact");
+    const visible = { top: true, contact: false };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          visible[e.target.id] = e.isIntersecting;
+        });
+        setShowMobileCTA(!visible.top && !visible.contact);
+      },
+      { threshold: 0.1 }
+    );
+    if (hero) observer.observe(hero);
+    if (contact) observer.observe(contact);
+    return () => observer.disconnect();
+  }, []);
 
   // 画像パス（Pages/file直開きの両対応）
   const asset = (p) => (process.env.PUBLIC_URL ? process.env.PUBLIC_URL + p : p);
@@ -129,8 +239,8 @@ export default function TigerWorksLanding() {
     { id: "top", label: t("トップ", "Top") },
     { id: "services", label: t("事業内容", "Services") },
     { id: "works", label: t("実績", "Works") },
-    { id: "company", label: t("会社概要", "Company") },
     { id: "message", label: t("代表メッセージ", "Message") },
+    { id: "company", label: t("会社概要", "Company") },
     { id: "contact", label: t("お問い合わせ", "Contact") },
   ];
 
@@ -206,7 +316,7 @@ export default function TigerWorksLanding() {
               href="https://stay.tiger-works.jp/"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 text-sm font-medium bg-neutral-900 text-white rounded-full hover:bg-neutral-700 transition-colors"
+              className="px-4 py-2 text-sm font-medium bg-brand text-white rounded-full hover:bg-brand-dark transition-colors"
             >
               {t("民泊予約", "Stay")}
             </a>
@@ -240,7 +350,7 @@ export default function TigerWorksLanding() {
                 href="https://stay.tiger-works.jp/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 text-sm font-medium text-center bg-neutral-900 text-white rounded-lg hover:bg-neutral-700 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-center bg-brand text-white rounded-lg hover:bg-brand-dark transition-colors"
               >
                 {t("民泊予約（Tiger House）", "Stay (Tiger House)")}
               </a>
@@ -279,6 +389,11 @@ export default function TigerWorksLanding() {
                 )}
               </h1>
             </FadeIn>
+            <FadeIn delay={100}>
+              <div className="text-[0.65rem] sm:text-xs tracking-[0.3em] uppercase text-white/60 mb-6 font-sans">
+                RENOVATION / LEASING / GUESTHOUSE
+              </div>
+            </FadeIn>
             <FadeIn delay={200}>
               <p className="text-base sm:text-xl text-neutral-100 max-w-lg sm:max-w-2xl mx-auto leading-relaxed mb-8 drop-shadow-sm">
                 {t(
@@ -311,8 +426,8 @@ export default function TigerWorksLanding() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <FadeIn>
               <div className="text-center mb-16">
-                <h2 className="font-serif text-3xl sm:text-4xl mb-4">{t("事業内容", "Services")}</h2>
-                <div className="w-12 h-1 bg-neutral-900 mx-auto mb-6"></div>
+                <h2 className="font-serif font-medium text-3xl sm:text-4xl mb-4">{t("事業内容", "Services")}</h2>
+                <div className="w-12 h-1 bg-brand mx-auto mb-6"></div>
                 <p className="text-neutral-600 max-w-2xl mx-auto">
                   {t(
                     "企画・設計から施工、運営管理まで。ワンストップで提供することで、コストを抑えながら高品質な空間づくりを実現します。",
@@ -325,40 +440,42 @@ export default function TigerWorksLanding() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
                 {
-                  icon: "🏢",
+                  icon: "building",
                   title: t("賃貸運営・管理", "Property Management"),
                   desc: t("自社保有物件の再生・運営ノウハウを活かし、オーナー様の収益最大化を支援。リーシングから修繕計画までトータルサポート。", "Maximizing owner returns with our revitalization know-how. Total support from leasing to maintenance planning.")
                 },
                 {
-                  icon: "🔨",
+                  icon: "hammer",
                   title: t("リノベーション設計・施工", "Renovation Design & Build"),
                   desc: t("古民家や築古アパートの魅力を引き出す設計。DIYと専門工事を組み合わせたハイブリッド施工でコストパフォーマンスを追求。", "Designing to highlight the charm of old homes. Hybrid construction mixing DIY and pro works for cost performance.")
                 },
                 {
-                  icon: "🏠",
+                  icon: "clipboard",
                   title: t("民泊・簡易宿所の立ち上げ", "Guesthouse Launch"),
                   desc: t("物件選定・事業収支計画から、旅館業・住宅宿泊事業の許認可申請、宿としての設計・内装まで。ゼロから収益施設をワンストップで立ち上げます。", "From property selection and business planning to licensing (ryokan/minpaku permits) and guest-ready design. Launching revenue facilities from scratch, all in one stop.")
                 },
                 {
-                  icon: "🛎",
+                  icon: "bell",
                   title: t("民泊運営代行", "Guesthouse Operations"),
                   desc: t("予約・ゲスト対応・清掃手配・料金調整・各種予約サイト運用まで運営を代行。自社施設で培ったノウハウで稼働率と収益を最大化します。", "Full operation on your behalf—bookings, guest support, cleaning, dynamic pricing, and OTA management. Maximizing occupancy with our hands-on know-how."),
                   link: { url: "https://stay.tiger-works.jp/", label: t("運営施設「Tiger House Kusabana」を見る", "Visit our facility: Tiger House Kusabana") }
                 },
                 {
-                  icon: "🌿",
+                  icon: "sprout",
                   title: t("古民家活用・再生", "Vacant Home Revitalization"),
                   desc: t("相続した空き家や使われていない古民家を、現地調査・補助金活用・収益化プランのご提案で再生。地域に根ざした活用をサポートします。", "Revitalizing inherited vacant homes and unused traditional houses through site surveys, subsidy utilization, and monetization plans rooted in the community.")
                 },
                 {
-                  icon: "🛋",
+                  icon: "sofa",
                   title: t("空間デザイン・スタイリング", "Interior Styling"),
                   desc: t("内装材の選定から家具・インテリアのコーディネートまで。物件のコンセプトに合わせた魅力的な空間を演出。", "Selection of finishes and furniture coordination. Creating attractive spaces that match the property concept.")
                 }
               ].map((service, i) => (
                 <FadeIn key={i} delay={i * 100}>
                   <div className="h-full p-8 rounded-2xl bg-neutral-50 hover:bg-white border border-neutral-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col">
-                    <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300 inline-block">{service.icon}</div>
+                    <div className="w-12 h-12 rounded-full bg-brand-light text-brand flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+                      <ServiceIcon name={service.icon} />
+                    </div>
                     <h3 className="font-serif text-xl font-semibold mb-3">{service.title}</h3>
                     <p className="text-neutral-600 text-sm leading-relaxed">{service.desc}</p>
                     {service.link && (
@@ -366,7 +483,7 @@ export default function TigerWorksLanding() {
                         href={service.link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-neutral-900 hover:gap-2 transition-all"
+                        className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:text-brand-dark hover:gap-2 transition-all"
                       >
                         {service.link.label}
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
@@ -387,7 +504,7 @@ export default function TigerWorksLanding() {
             <div className="grid lg:grid-cols-[1fr,2fr] gap-12 items-start">
               <FadeIn>
                 <div className="lg:sticky lg:top-32">
-                  <h2 className="font-serif text-3xl sm:text-4xl mb-4">{t("実績紹介", "Our Works")}</h2>
+                  <h2 className="font-serif font-medium text-3xl sm:text-4xl mb-4">{t("実績紹介", "Our Works")}</h2>
                   <div className="w-12 h-1 bg-white mb-6"></div>
                   <p className="text-neutral-400 mb-8 leading-relaxed">
                     {t(
@@ -396,7 +513,7 @@ export default function TigerWorksLanding() {
                     )}
                   </p>
                   <div className="hidden lg:block p-6 rounded-2xl bg-neutral-800 border border-neutral-700/50">
-                    <div className="text-3xl font-serif mb-2">Before / After</div>
+                    <div className="text-3xl font-serif font-medium mb-2">Before / After</div>
                     <p className="text-sm text-neutral-400">
                       {t(
                         "スライダーを左右に動かすことで、リノベーション前後の変化をご覧いただけます。",
@@ -412,7 +529,7 @@ export default function TigerWorksLanding() {
                   <FadeIn key={i} delay={i * 100}>
                     <article className="flex flex-col gap-6">
                       {work.type === 'comparison' ? (
-                        <BeforeAfterSlider before={work.before} after={work.after} alt={work.title} />
+                        <BeforeAfterSlider before={work.before} after={work.after} alt={work.title} hint={t("← スライドして比較 →", "← Drag to compare →")} />
                       ) : (
                         <div className="rounded-2xl overflow-hidden shadow-lg aspect-[4/3] sm:aspect-video group">
                           <img src={work.src} alt={work.title} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -444,14 +561,14 @@ export default function TigerWorksLanding() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:hidden"></div>
                   <div className="absolute bottom-6 left-6 text-white md:hidden">
                     <div className="text-xs opacity-80 mb-1">{t("代表取締役", "CEO")}</div>
-                    <div className="font-serif text-xl">池田 健虎</div>
+                    <div className="font-serif font-medium text-xl">池田 健虎</div>
                   </div>
                 </div>
               </FadeIn>
               
               <FadeIn delay={200}>
                 <div>
-                  <h2 className="font-serif text-3xl sm:text-4xl mb-8">{t("代表メッセージ", "Message")}</h2>
+                  <h2 className="font-serif font-medium text-3xl sm:text-4xl mb-8">{t("代表メッセージ", "Message")}</h2>
                   
                   <div className="prose prose-neutral text-neutral-600 leading-loose">
                     <p className="mb-6">
@@ -476,7 +593,7 @@ export default function TigerWorksLanding() {
 
                   <div className="mt-10 hidden md:block">
                     <div className="text-sm text-neutral-500 mb-1">{t("代表取締役", "Representative Director")}</div>
-                    <div className="font-serif text-2xl">池田 健虎 <span className="text-lg text-neutral-400 ml-2 font-sans">Taketo Ikeda</span></div>
+                    <div className="font-serif font-medium text-2xl">池田 健虎 <span className="text-lg text-neutral-400 ml-2 font-sans">Taketo Ikeda</span></div>
                   </div>
                 </div>
               </FadeIn>
@@ -489,8 +606,8 @@ export default function TigerWorksLanding() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <FadeIn>
               <div className="text-center mb-16">
-                <h2 className="font-serif text-3xl sm:text-4xl mb-4">{t("会社概要", "Company")}</h2>
-                <div className="w-12 h-1 bg-neutral-900 mx-auto"></div>
+                <h2 className="font-serif font-medium text-3xl sm:text-4xl mb-4">{t("会社概要", "Company")}</h2>
+                <div className="w-12 h-1 bg-brand mx-auto"></div>
               </div>
 
               <div className="grid sm:grid-cols-[1fr,2fr] border-t border-neutral-200">
@@ -517,7 +634,7 @@ export default function TigerWorksLanding() {
         <section id="contact" className="py-20 sm:py-32 bg-neutral-50">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
             <FadeIn>
-              <h2 className="font-serif text-3xl sm:text-4xl mb-4">{t("お問い合わせ", "Contact")}</h2>
+              <h2 className="font-serif font-medium text-3xl sm:text-4xl mb-4">{t("お問い合わせ", "Contact")}</h2>
               <p className="text-neutral-600 mb-10">
                 {t(
                   "リノベーションのご相談、物件活用のお悩みなど、お気軽にお問い合わせください。",
@@ -543,7 +660,7 @@ export default function TigerWorksLanding() {
               </p>
               <a
                 href="mailto:info@tiger-works.jp"
-                className="mt-2 inline-flex items-center gap-2 text-neutral-900 font-medium hover:gap-3 transition-all"
+                className="mt-2 inline-flex items-center gap-2 text-neutral-900 font-medium hover:text-brand hover:gap-3 transition-all"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
@@ -557,17 +674,69 @@ export default function TigerWorksLanding() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-neutral-900 text-white py-12 border-t border-neutral-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
-            <img src={asset('/works/logo_silver_bright.webp')} alt="Logo" loading="lazy" decoding="async" className="w-8 h-8 object-contain" />
-            <span className="font-serif font-bold tracking-wide">TigerWorks Inc.</span>
+      <footer className="bg-neutral-900 text-white pt-16 pb-24 md:pb-12 border-t border-neutral-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid gap-10 md:grid-cols-3">
+            {/* ロゴ + 一文 */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <img src={asset('/works/logo_silver_bright.webp')} alt="Logo" loading="lazy" decoding="async" className="w-8 h-8 object-contain" />
+                <span className="font-serif font-bold tracking-wide">TigerWorks Inc.</span>
+              </div>
+              <p className="text-sm text-neutral-400 leading-relaxed">
+                {t("古き良きものを、次代へ。", "Reviving tradition for the future.")}
+              </p>
+            </div>
+
+            {/* サイト内ナビ + 民泊予約 */}
+            <nav className="flex flex-col gap-2" aria-label={t("フッターナビ", "Footer navigation")}>
+              {nav.map((n) => (
+                <a key={n.id} href={`#${n.id}`} className="text-sm text-neutral-400 hover:text-white transition-colors w-fit">
+                  {n.label}
+                </a>
+              ))}
+              <a
+                href="https://stay.tiger-works.jp/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-neutral-400 hover:text-white transition-colors w-fit"
+              >
+                {t("民泊予約（Tiger House）", "Stay (Tiger House)")}
+              </a>
+            </nav>
+
+            {/* 会社情報 */}
+            <div className="text-sm text-neutral-400 leading-relaxed">
+              <div className="font-serif font-medium text-neutral-200 mb-3">{t("株式会社TigerWorks", "TigerWorks Inc.")}</div>
+              <p className="mb-2">{t("〒196-0033 東京都昭島市福島町908-33", "908-33 Fukujimacho, Akishima, Tokyo, 196-0033 Japan")}</p>
+              <a href="mailto:info@tiger-works.jp" className="hover:text-white transition-colors">info@tiger-works.jp</a>
+            </div>
           </div>
-          <div className="text-xs text-neutral-500">
+
+          <div className="mt-12 pt-8 border-t border-neutral-800 text-xs text-neutral-500 text-center">
             &copy; {new Date().getFullYear()} TigerWorks Inc. All rights reserved.
           </div>
         </div>
       </footer>
+
+      {/* Mobile Fixed CTA */}
+      <div
+        className={`md:hidden fixed inset-x-0 bottom-0 z-40 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-white/90 backdrop-blur-md border-t border-neutral-200 transition-all duration-300 ${
+          showMobileCTA ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
+        }`}
+        aria-hidden={!showMobileCTA}
+      >
+        <a
+          href="#contact"
+          className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-brand text-white rounded-full font-medium shadow-lg active:bg-brand-dark transition-colors"
+          tabIndex={showMobileCTA ? 0 : -1}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+          </svg>
+          {t("お問い合わせ", "Contact Us")}
+        </a>
+      </div>
     </div>
   );
 }

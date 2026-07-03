@@ -203,7 +203,7 @@ export default function TigerWorksLanding() {
               </a>
             ))}
             <a
-              href="https://tiger-house-hp.web.app/"
+              href="https://stay.tiger-works.jp/"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 text-sm font-medium bg-neutral-900 text-white rounded-full hover:bg-neutral-700 transition-colors"
@@ -237,7 +237,7 @@ export default function TigerWorksLanding() {
               ))}
               <div className="h-px bg-neutral-100 my-1"></div>
               <a
-                href="https://tiger-house-hp.web.app/"
+                href="https://stay.tiger-works.jp/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-4 py-2 text-sm font-medium text-center bg-neutral-900 text-white rounded-lg hover:bg-neutral-700 transition-colors"
@@ -343,7 +343,7 @@ export default function TigerWorksLanding() {
                   icon: "🛎",
                   title: t("民泊運営代行", "Guesthouse Operations"),
                   desc: t("予約・ゲスト対応・清掃手配・料金調整・各種予約サイト運用まで運営を代行。自社施設で培ったノウハウで稼働率と収益を最大化します。", "Full operation on your behalf—bookings, guest support, cleaning, dynamic pricing, and OTA management. Maximizing occupancy with our hands-on know-how."),
-                  link: { url: "https://tiger-house-hp.web.app/", label: t("運営施設「Tiger House Kusabana」を見る", "Visit our facility: Tiger House Kusabana") }
+                  link: { url: "https://stay.tiger-works.jp/", label: t("運営施設「Tiger House Kusabana」を見る", "Visit our facility: Tiger House Kusabana") }
                 },
                 {
                   icon: "🌿",

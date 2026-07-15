@@ -1,742 +1,212 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
+import { siteConfig } from "./siteConfig";
 
-// --- Components ---
+const concerns = [
+  "相続した家を残したいが、管理を続けられない",
+  "売却や解体以外の可能性も検討したい",
+  "修繕にいくらかかるのか分からない",
+  "遠方に住んでいて、頻繁に現地へ行けない",
+  "民泊、賃貸、家族利用のどれが適しているか分からない",
+];
 
-const BeforeAfterSlider = ({ before, after, alt, hint }) => {
-  const [sliderPosition, setSliderPosition] = useState(50);
-  const [isDragging, setIsDragging] = useState(false);
-  const [showHint, setShowHint] = useState(true);
-  const containerRef = useRef(null);
+const services = [
+  ["01", "物件と立地の可能性確認", "建物の状態、立地、周辺環境、法令・自治体ルール、駐車場などを確認します。"],
+  ["02", "活用方法と概算収支の検討", "民泊、賃貸、売却、家族利用を比較し、必要な修繕と概算収支を整理します。"],
+  ["03", "改修計画の作成", "残す部分と直す部分を見極め、予算や使い方、清掃・維持管理まで考えた計画をつくります。"],
+  ["04", "専門業者への発注支援・施工調整", "オーナー様と各専門業者が直接契約し、TigerWorksが仕様整理、発注支援、工程調整、現場確認を行います。"],
+  ["05", "民泊・賃貸等の開始準備", "コンセプト、備品、撮影、掲載準備、利用案内、清掃体制を整えます。許認可は必要に応じ専門家と連携します。"],
+  ["06", "継続できる運営方法の設計", "予約、清掃、修繕、報告など、開業後に無理なく続けられる運営の流れを設計します。"],
+];
 
-  const moveTo = (clientX) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    setSliderPosition((x / rect.width) * 100);
-  };
+const values = [
+  ["家の記憶を尊重する", "古い柱、建具、畳、庭など、その家らしさを見極めて残します。"],
+  ["現場と収支の両方から考える", "見た目だけでなく、修繕費、清掃、運営負担まで現実的に検討します。"],
+  ["無理に民泊を勧めない", "賃貸、売却、家族利用も含め、その家と所有者に合う選択肢を考えます。"],
+];
 
-  const onPointerDown = (e) => {
-    setIsDragging(true);
-    setShowHint(false);
-    e.currentTarget.setPointerCapture?.(e.pointerId);
-    moveTo(e.clientX);
-  };
-  const onPointerMove = (e) => {
-    if (isDragging) moveTo(e.clientX);
-  };
-  const stopDragging = () => setIsDragging(false);
+const flow = [
+  ["01", "まずは状況を伺います", "所在地、建物の状態、相続や管理の状況、残したい思いなどをお聞きします。"],
+  ["02", "可能性と進め方を整理します", "現地確認の要否や、比較すべき活用方法、必要な調査をご案内します。"],
+  ["03", "必要な支援をご提案します", "物件の状況とご希望に応じて、診断、改修計画、開業準備などの範囲をお見積もりします。"],
+];
 
-  const onKeyDown = (e) => {
-    setShowHint(false);
-    if (e.key === "ArrowLeft") {
-      setSliderPosition((p) => Math.max(0, p - 5));
-      e.preventDefault();
-    } else if (e.key === "ArrowRight") {
-      setSliderPosition((p) => Math.min(100, p + 5));
-      e.preventDefault();
-    } else if (e.key === "Home") {
-      setSliderPosition(0);
-      e.preventDefault();
-    } else if (e.key === "End") {
-      setSliderPosition(100);
-      e.preventDefault();
-    }
-  };
+const nav = [
+  ["/about.html", "私たちについて"],
+  ["#services", "事業内容"],
+  ["#case", "再生事例"],
+  ["#partners", "パートナーの方へ"],
+  ["#company", "会社概要"],
+];
 
-  return (
-    <div
-      ref={containerRef}
-      role="slider"
-      tabIndex={0}
-      aria-label={`Before / After: ${alt}`}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={Math.round(sliderPosition)}
-      aria-valuetext={`Before ${Math.round(sliderPosition)}%`}
-      className={`relative w-full aspect-[4/3] sm:aspect-video overflow-hidden rounded-2xl select-none touch-none shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900 ${isDragging ? "cursor-ew-resize" : "cursor-grab"}`}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={stopDragging}
-      onPointerCancel={stopDragging}
-      onKeyDown={onKeyDown}
-    >
-      {/* After Image (Base) */}
-      <img src={after} alt={`After: ${alt}`} loading="lazy" decoding="async" draggable={false} className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
-
-      {/* Before Image (Overlay) */}
-      <div
-        className="absolute inset-0 w-full h-full overflow-hidden"
-        style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
-      >
-        <img src={before} alt={`Before: ${alt}`} loading="lazy" decoding="async" draggable={false} className="absolute inset-0 w-full h-full object-cover max-w-none pointer-events-none" />
-      </div>
-
-      {/* Slider Handle */}
-      <div
-        className="absolute top-0 bottom-0 w-0.5 bg-white z-10 pointer-events-none"
-        style={{ left: `${sliderPosition}%` }}
-      >
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-neutral-900 rounded-full p-2 shadow-xl border border-neutral-100">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" transform="rotate(-90 12 12)" />
-          </svg>
-        </div>
-      </div>
-
-      {/* Labels */}
-      <div className="absolute top-4 left-4 bg-black/50 text-white text-xs px-2 py-1 rounded backdrop-blur-sm pointer-events-none">Before</div>
-      <div className="absolute top-4 right-4 bg-black/50 text-white text-xs px-2 py-1 rounded backdrop-blur-sm pointer-events-none">After</div>
-
-      {/* Mobile drag hint */}
-      {showHint && hint && (
-        <div className="lg:hidden absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm pointer-events-none animate-pulse whitespace-nowrap">
-          {hint}
-        </div>
-      )}
-    </div>
-  );
-};
-
-const FadeIn = ({ children, className = "", delay = 0 }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-1000 ease-out ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-      } ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-};
-
-// --- Service Icons (lucide-style stroke icons, no external dependency) ---
-const ICON_PATHS = {
-  building: (
-    <>
-      <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
-      <path d="M9 22v-4h6v4" />
-      <path d="M8 6h.01" /><path d="M12 6h.01" /><path d="M16 6h.01" />
-      <path d="M8 10h.01" /><path d="M12 10h.01" /><path d="M16 10h.01" />
-      <path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" />
-    </>
-  ),
-  hammer: (
-    <>
-      <path d="m15 12-8.5 8.5a2.12 2.12 0 1 1-3-3L12 9" />
-      <path d="M17.64 15 22 10.64" />
-      <path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h.86c.85 0 1.65.33 2.25.93l1.25 1.25" />
-    </>
-  ),
-  clipboard: (
-    <>
-      <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-      <path d="m9 14 2 2 4-4" />
-    </>
-  ),
-  bell: (
-    <>
-      <path d="M3 20a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1Z" />
-      <path d="M20 16a8 8 0 1 0-16 0" />
-      <path d="M12 4v4" />
-      <path d="M10 4h4" />
-    </>
-  ),
-  sprout: (
-    <>
-      <path d="M7 20h10" />
-      <path d="M10 20c5.5-2.5.8-6.4 3-10" />
-      <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z" />
-      <path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z" />
-    </>
-  ),
-  sofa: (
-    <>
-      <path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3" />
-      <path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0Z" />
-      <path d="M4 18v2" />
-      <path d="M20 18v2" />
-      <path d="M12 4v9" />
-    </>
-  ),
-};
-
-const ServiceIcon = ({ name }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="w-6 h-6"
-    aria-hidden="true"
-  >
-    {ICON_PATHS[name]}
-  </svg>
-);
+function Image({ src, alt, className = "" }) {
+  return <img src={src} alt={alt} width="1200" height="800" loading="lazy" decoding="async" className={className} />;
+}
 
 export default function TigerWorksLanding() {
-  const [lang, setLang] = useState(() => {
-    if (typeof window === "undefined") return "ja";
-    return localStorage.getItem("tw-lang") === "en" ? "en" : "ja";
-  });
-  const t = (ja, en) => (lang === "ja" ? ja : en);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
-    document.documentElement.lang = lang;
-    try {
-      localStorage.setItem("tw-lang", lang);
-    } catch (e) {
-      /* localStorage unavailable (private mode等) */
-    }
-  }, [lang]);
+    if (!menuOpen) return undefined;
+    const close = (event) => event.key === "Escape" && setMenuOpen(false);
+    addEventListener("keydown", close);
+    return () => removeEventListener("keydown", close);
+  }, [menuOpen]);
 
-  // モバイル固定CTA: ヒーロー/お問い合わせが見えている間は非表示
-  const [showMobileCTA, setShowMobileCTA] = useState(false);
-  useEffect(() => {
-    const hero = document.getElementById("top");
-    const contact = document.getElementById("contact");
-    const visible = { top: true, contact: false };
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          visible[e.target.id] = e.isIntersecting;
-        });
-        setShowMobileCTA(!visible.top && !visible.contact);
-      },
-      { threshold: 0.1 }
-    );
-    if (hero) observer.observe(hero);
-    if (contact) observer.observe(contact);
-    return () => observer.disconnect();
-  }, []);
+  const managementText = siteConfig.managementServiceStatus === "available"
+    ? "運営管理のご相談を受け付けています。"
+    : "運営管理サービスは提供開始に向けて準備中です。";
 
-  // 画像パス（Pages/file直開きの両対応）
-  const asset = (p) => (process.env.PUBLIC_URL ? process.env.PUBLIC_URL + p : p);
-
-  const nav = [
-    { id: "top", label: t("トップ", "Top") },
-    { id: "services", label: t("事業内容", "Services") },
-    { id: "works", label: t("実績", "Works") },
-    { id: "message", label: t("代表メッセージ", "Message") },
-    { id: "company", label: t("会社概要", "Company") },
-    { id: "contact", label: t("お問い合わせ", "Contact") },
-  ];
-
-  // 実績データ
-  const works = [
-    {
-      type: "comparison",
-      before: asset("/works/japanese_room_before.webp"),
-      after: asset("/works/japanese_room2.webp"),
-      title: t("古民家 和室リノベーション", "Traditional Room Renovation"),
-      location: t("埼玉県熊谷市（築64年）", "Kumagaya, Saitama (64y)"),
-      desc: t(
-        "暗く閉塞感のあった和室を、既存の建具や柱を活かしつつ、明るく開放的な空間へ再生しました。",
-        "Revitalized a dark traditional room into a bright, open space while preserving original fittings and pillars."
-      )
-    },
-    {
-      type: "comparison",
-      before: asset("/works/living_before.webp"),
-      after: asset("/works/living_renovation.webp"),
-      title: t("リビング リノベーション", "Living Room Renovation"),
-      location: t("東京都あきる野市（築50年）", "Akiruno, Tokyo (50y)"),
-      desc: t(
-         "既存の建具を活かしつつ丁寧に塗装を施し、部屋の雰囲気に合わせてインテリアをコーディネートしました。",
-        "We utilized existing fittings with careful painting, and coordinated the interior to match the room's atmosphere."
-      )
-    },
-    {
-      type: "single",
-      src: asset("/works/kitchen.webp"),
-      title: t("キッチン リノベーション", "Kitchen Renovation"),
-      location: t("埼玉県熊谷市（築64年）", "Kumagaya, Saitama (64y)"),
-      desc: t(
-        "使い勝手の悪かった旧式キッチンを、機能的なシステムキッチンへ変更しつつ、レトロな雰囲気を残しました。",
-        "Replaced an outdated kitchen with a functional modern system while retaining a retro atmosphere."
-      )
-    },
-    {
-      type: "single",
-      src: asset("/works/Interior_coordinator.webp"),
-      title: t("マンション ステージング", "Apartment Staging"),
-      location: t("東京都杉並区（築4年）", "Suginami, Tokyo (4y)"),
-      desc: t(
-        "売却用マンションのホームステージング。購入後の生活イメージを湧きやすくするためのインテリアコーディネート。",
-        "Home staging for sale. Interior coordination to help buyers visualize their future life."
-      )
-    },
-  ];
+  const openForm = () => setNotice(`相談フォームを開きます。送信後、${siteConfig.replyTime}にご連絡します。`);
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans antialiased selection:bg-neutral-900 selection:text-white">
-      
-      {/* Header */}
-      <header className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-neutral-200/50 transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
-          <a href="#top" className="flex items-center gap-3 group">
-            <img
-              src={asset('/works/logo.webp')}
-              alt="TigerWorks Logo"
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-contain transition-transform group-hover:scale-105"
-            />
-            <span className="font-serif font-bold text-lg sm:text-xl tracking-tight">TigerWorks Inc.</span>
-          </a>
-          
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            {nav.map((n) => (
-              <a key={n.id} href={`#${n.id}`} className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-neutral-900 after:transition-all hover:after:w-full">
-                {n.label}
-              </a>
-            ))}
-            <a
-              href="https://stay.tiger-works.jp/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 text-sm font-medium bg-brand text-white rounded-full hover:bg-brand-dark transition-colors"
-            >
-              {t("民泊予約", "Stay")}
-            </a>
-            <div className="w-px h-4 bg-neutral-300 mx-2"></div>
-            <div className="flex items-center gap-1 bg-neutral-100 p-1 rounded-lg">
-              <button onClick={() => setLang('ja')} className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${lang==='ja'?'bg-white shadow text-neutral-900':'text-neutral-500 hover:text-neutral-900'}`}>JA</button>
-              <button onClick={() => setLang('en')} className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${lang==='en'?'bg-white shadow text-neutral-900':'text-neutral-500 hover:text-neutral-900'}`}>EN</button>
-            </div>
+    <div className="site-shell">
+      <a className="skip-link" href="#main">本文へ移動</a>
+      <header className="header">
+        <a href="#top" className="brand" aria-label="TigerWorks トップへ">
+          <img src="/works/logo.webp" alt="" width="44" height="44" />
+          <span>TigerWorks</span>
+        </a>
+        <nav className="desktop-nav" aria-label="メインナビゲーション">
+          {nav.map(([href, label]) => <a key={href} href={href}>{label}</a>)}
+          <a className="button small" href="#contact">空き家の活用を相談する</a>
+        </nav>
+        <button className="menu-button" aria-expanded={menuOpen} aria-controls="mobile-menu" onClick={() => setMenuOpen((value) => !value)}>
+          {menuOpen ? "閉じる" : "メニュー"}
+        </button>
+        {menuOpen && (
+          <nav id="mobile-menu" className="mobile-nav" aria-label="モバイルナビゲーション">
+            {nav.map(([href, label]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>)}
+            <a href="#contact" onClick={() => setMenuOpen(false)}>空き家の活用を相談する</a>
           </nav>
-
-          {/* Mobile Nav Toggle */}
-          <details className="md:hidden relative group">
-            <summary className="list-none cursor-pointer p-2 rounded-md hover:bg-neutral-100">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-              </svg>
-            </summary>
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-neutral-100 p-2 flex flex-col gap-1 z-50">
-              {nav.map((n) => (
-                <a 
-                  key={n.id} 
-                  href={`#${n.id}`} 
-                  className="px-4 py-2 text-sm rounded-lg hover:bg-neutral-50 transition-colors"
-                  onClick={(e) => e.currentTarget.closest('details').removeAttribute('open')}
-                >
-                  {n.label}
-                </a>
-              ))}
-              <div className="h-px bg-neutral-100 my-1"></div>
-              <a
-                href="https://stay.tiger-works.jp/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 text-sm font-medium text-center bg-brand text-white rounded-lg hover:bg-brand-dark transition-colors"
-              >
-                {t("民泊予約（Tiger House）", "Stay (Tiger House)")}
-              </a>
-              <div className="flex justify-center gap-2 p-2">
-                <button onClick={() => setLang('ja')} className={`px-3 py-1 text-xs font-medium rounded-md ${lang==='ja'?'bg-neutral-900 text-white':'bg-neutral-100 text-neutral-600'}`}>JA</button>
-                <button onClick={() => setLang('en')} className={`px-3 py-1 text-xs font-medium rounded-md ${lang==='en'?'bg-neutral-900 text-white':'bg-neutral-100 text-neutral-600'}`}>EN</button>
-              </div>
-            </div>
-            <div className="fixed inset-0 z-40 bg-transparent hidden group-open:block" onClick={(e) => e.target.closest('details').removeAttribute('open')}></div>
-          </details>
-        </div>
+        )}
       </header>
 
-      <main className="pt-16 sm:pt-20">
-        
-        {/* Hero Section */}
-        <section id="top" className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-neutral-900">
-          {/* Background Image with Overlay */}
-          <div className="absolute inset-0 z-0">
-            <img
-              src={asset("/works/work2.webp")}
-              alt="Hero Background"
-              fetchpriority="high"
-              decoding="async"
-              className="w-full h-full object-cover opacity-60"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-neutral-900"></div>
-          </div>
-
-          <div className="relative z-10 max-w-6xl mx-auto px-6 text-center text-white w-full">
-            <FadeIn>
-              <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-medium tracking-tight leading-tight mb-6 drop-shadow-md">
-                {t(
-                  <>古き良きものを、<br className="sm:hidden"/>次代へ。</>,
-                  <>Reviving Tradition<br/>for the Future</>
-                )}
-              </h1>
-            </FadeIn>
-            <FadeIn delay={100}>
-              <div className="text-[0.65rem] sm:text-xs tracking-[0.3em] uppercase text-white/60 mb-6 font-sans">
-                RENOVATION / LEASING / GUESTHOUSE
-              </div>
-            </FadeIn>
-            <FadeIn delay={200}>
-              <p className="text-base sm:text-xl text-neutral-100 max-w-lg sm:max-w-2xl mx-auto leading-relaxed mb-8 drop-shadow-sm">
-                {t(
-                  "築古不動産に新たな息吹を。手仕事による再生、地域に根ざした運営で、建物本来の価値を取り戻します。",
-                  "Breathing new life into aged properties. We restore original value through hands-on renovation and community-rooted operations."
-                )}
-              </p>
-            </FadeIn>
-            <FadeIn delay={400}>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 px-4 sm:px-0">
-                <a href="#works" className="w-full sm:w-auto px-8 py-4 bg-white text-neutral-900 rounded-full font-medium hover:bg-neutral-100 transition-all transform hover:scale-105 shadow-lg min-w-[160px]">
-                  {t("実績を見る", "View Works")}
-                </a>
-                <a href="#contact" className="w-full sm:w-auto px-8 py-4 bg-transparent border border-white/40 text-white rounded-full font-medium hover:bg-white/10 transition-all backdrop-blur-sm min-w-[160px]">
-                  {t("お問い合わせ", "Contact Us")}
-                </a>
-              </div>
-            </FadeIn>
-          </div>
-          
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-white/50">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-            </svg>
+      <main id="main">
+        <section id="top" className="hero">
+          <img src={siteConfig.images.hero} alt="木の天井や床の間を生かして再生した草花の家の和室" width="1600" height="1067" fetchpriority="high" />
+          <div className="hero-shade" />
+          <div className="hero-content">
+            <h1>愛された家を、<br />次の世代へ。</h1>
+            <p className="hero-description">TigerWorksは、相続した空き家や古民家の可能性を見極め、改修の企画、民泊・賃貸などの活用設計、開業準備まで支援します。東京都多摩地域を中心に、売却や解体だけではない選択肢を一緒に考えます。</p>
+            <div className="hero-actions">
+              <a className="button light-button" href="#contact">空き家の活用を相談する</a>
+              <a className="secondary-link" href="#case">草花の家の再生事例を見る</a>
+            </div>
+            <p className="hero-note">活用方法が決まっていない段階でもご相談いただけます。</p>
           </div>
         </section>
 
-        {/* Services Section */}
-        <section id="services" className="py-20 sm:py-32 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <FadeIn>
-              <div className="text-center mb-16">
-                <h2 className="font-serif font-medium text-3xl sm:text-4xl mb-4">{t("事業内容", "Services")}</h2>
-                <div className="w-12 h-1 bg-brand mx-auto mb-6"></div>
-                <p className="text-neutral-600 max-w-2xl mx-auto">
-                  {t(
-                    "企画・設計から施工、運営管理まで。ワンストップで提供することで、コストを抑えながら高品質な空間づくりを実現します。",
-                    "From planning and design to construction and operation. Our one-stop service ensures high quality at optimized costs."
-                  )}
-                </p>
-              </div>
-            </FadeIn>
+        <section className="section concerns">
+          <div className="wide split-heading">
+            <div><p className="section-label">相続空き家について</p><h2 className="section-heading--short">このようなお悩みはありませんか。</h2></div>
+            <ul className="concern-list">{concerns.map((concern) => <li key={concern}>{concern}</li>)}</ul>
+          </div>
+        </section>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[
-                {
-                  icon: "building",
-                  title: t("賃貸運営・管理", "Property Management"),
-                  desc: t("自社保有物件の再生・運営ノウハウを活かし、オーナー様の収益最大化を支援。リーシングから修繕計画までトータルサポート。", "Maximizing owner returns with our revitalization know-how. Total support from leasing to maintenance planning.")
-                },
-                {
-                  icon: "hammer",
-                  title: t("リノベーション設計・施工", "Renovation Design & Build"),
-                  desc: t("古民家や築古アパートの魅力を引き出す設計。DIYと専門工事を組み合わせたハイブリッド施工でコストパフォーマンスを追求。", "Designing to highlight the charm of old homes. Hybrid construction mixing DIY and pro works for cost performance.")
-                },
-                {
-                  icon: "clipboard",
-                  title: t("民泊・簡易宿所の立ち上げ", "Guesthouse Launch"),
-                  desc: t("物件選定・事業収支計画から、旅館業・住宅宿泊事業の許認可申請、宿としての設計・内装まで。ゼロから収益施設をワンストップで立ち上げます。", "From property selection and business planning to licensing (ryokan/minpaku permits) and guest-ready design. Launching revenue facilities from scratch, all in one stop.")
-                },
-                {
-                  icon: "bell",
-                  title: t("民泊運営代行", "Guesthouse Operations"),
-                  desc: t("予約・ゲスト対応・清掃手配・料金調整・各種予約サイト運用まで運営を代行。自社施設で培ったノウハウで稼働率と収益を最大化します。", "Full operation on your behalf—bookings, guest support, cleaning, dynamic pricing, and OTA management. Maximizing occupancy with our hands-on know-how."),
-                  link: { url: "https://stay.tiger-works.jp/", label: t("運営施設「Tiger House Kusabana」を見る", "Visit our facility: Tiger House Kusabana") }
-                },
-                {
-                  icon: "sprout",
-                  title: t("古民家活用・再生", "Vacant Home Revitalization"),
-                  desc: t("相続した空き家や使われていない古民家を、現地調査・補助金活用・収益化プランのご提案で再生。地域に根ざした活用をサポートします。", "Revitalizing inherited vacant homes and unused traditional houses through site surveys, subsidy utilization, and monetization plans rooted in the community.")
-                },
-                {
-                  icon: "sofa",
-                  title: t("空間デザイン・スタイリング", "Interior Styling"),
-                  desc: t("内装材の選定から家具・インテリアのコーディネートまで。物件のコンセプトに合わせた魅力的な空間を演出。", "Selection of finishes and furniture coordination. Creating attractive spaces that match the property concept.")
-                }
-              ].map((service, i) => (
-                <FadeIn key={i} delay={i * 100}>
-                  <div className="h-full p-8 rounded-2xl bg-neutral-50 hover:bg-white border border-neutral-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col">
-                    <div className="w-12 h-12 rounded-full bg-brand-light text-brand flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
-                      <ServiceIcon name={service.icon} />
-                    </div>
-                    <h3 className="font-serif text-xl font-semibold mb-3">{service.title}</h3>
-                    <p className="text-neutral-600 text-sm leading-relaxed">{service.desc}</p>
-                    {service.link && (
-                      <a
-                        href={service.link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:text-brand-dark hover:gap-2 transition-all"
-                      >
-                        {service.link.label}
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                        </svg>
-                      </a>
-                    )}
-                  </div>
-                </FadeIn>
+        <section id="services" className="section services">
+          <div className="wide">
+            <div className="section-heading">
+              <div><p className="section-label">事業内容</p><h2 className="section-heading--short">TigerWorksができること。</h2></div>
+              <p>活用方法が決まる前から、物件の確認、改修計画、始めるための準備までを一続きで考えます。</p>
+            </div>
+            <p className="service-message">民泊ありきではなく、その家に合った方法を考えます。</p>
+            <div className="service-list">
+              {services.map(([no, title, body]) => (
+                <article key={no}><span className="service-no">{no}</span><div><h3>{title}</h3><p>{body}</p>{no === "06" && <strong>{managementText}</strong>}</div></article>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Works Section (Before/After) */}
-        <section id="works" className="py-20 sm:py-32 bg-neutral-900 text-white overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="grid lg:grid-cols-[1fr,2fr] gap-12 items-start">
-              <FadeIn>
-                <div className="lg:sticky lg:top-32">
-                  <h2 className="font-serif font-medium text-3xl sm:text-4xl mb-4">{t("実績紹介", "Our Works")}</h2>
-                  <div className="w-12 h-1 bg-white mb-6"></div>
-                  <p className="text-neutral-400 mb-8 leading-relaxed">
-                    {t(
-                      "私たちが手がけた再生事例の一部をご紹介します。古い建物のポテンシャルを最大限に引き出し、現代の暮らしにフィットする空間へと生まれ変わらせています。",
-                      "Here are some of our revitalization projects. We maximize the potential of old buildings, transforming them into spaces that fit modern living."
-                    )}
-                  </p>
-                  <div className="hidden lg:block p-6 rounded-2xl bg-neutral-800 border border-neutral-700/50">
-                    <div className="text-3xl font-serif font-medium mb-2">Before / After</div>
-                    <p className="text-sm text-neutral-400">
-                      {t(
-                        "スライダーを左右に動かすことで、リノベーション前後の変化をご覧いただけます。",
-                        "Drag the slider to see the transformation before and after the renovation."
-                      )}
-                    </p>
-                  </div>
+        <section id="case" className="section case-section">
+          <div className="photo-wide">
+            <div className="section-heading case-heading">
+              <div><p className="section-label">草花の家 再生事例</p><h2>5年間空き家だった家に、<br />もう一度、人が集まる<br className="case-mobile-break" />時間を。</h2></div>
+              <p>東京都あきる野市<br />Tiger House Kusabana</p>
+            </div>
+            <div className="case-editorial">
+              <figure className="case-before"><Image src={siteConfig.images.renovation} alt="空き家時代の草花の家のリビング" /><figcaption><strong>再生前</strong><span>設備が使えず、そのままでは暮らせなかった室内</span></figcaption></figure>
+              <div className="case-facts" aria-label="草花の家の再生概要">
+                <div className="case-story-copy">
+                  <p>TigerWorksが最初に再生した草花の家は、約5年間、空き家になっていました。</p>
+                  <p>給湯器やガス設備は使えず、そのままでは暮らすことのできない状態でした。けれど、古い建具や木の天井、柱や間取りには、この家ならではの魅力が残っていました。</p>
+                  <p>代表自ら、床、壁、柱、天井、キッチン、和室、階段、フローリングなど、一部屋ずつ状態を確かめながら丁寧に修繕しました。</p>
+                  <p>一方で、外壁工事は施工業者へ、電気工事は電気工事業者へ、畳の表替えは畳店へ、給湯器とガス設備はガスの専門業者へ依頼しました。</p>
+                  <p>自分たちでできる部分と、専門家へ任せる部分を見極めながら、その家らしさを残して再生。現在は、家族や友人が訪れ、新しい時間を過ごす一棟貸しの宿として活用されています。</p>
                 </div>
-              </FadeIn>
-
-              <div className="flex flex-col gap-16 sm:gap-24">
-                {works.map((work, i) => (
-                  <FadeIn key={i} delay={i * 100}>
-                    <article className="flex flex-col gap-6">
-                      {work.type === 'comparison' ? (
-                        <BeforeAfterSlider before={work.before} after={work.after} alt={work.title} hint={t("← スライドして比較 →", "← Drag to compare →")} />
-                      ) : (
-                        <div className="rounded-2xl overflow-hidden shadow-lg aspect-[4/3] sm:aspect-video group">
-                          <img src={work.src} alt={work.title} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                        </div>
-                      )}
-                      <div>
-                        <div className="flex items-center gap-3 text-sm text-neutral-400 mb-2">
-                          <span className="px-2 py-0.5 rounded border border-neutral-700 text-xs uppercase tracking-wider">{t("Project", "Project")}</span>
-                          <span>{work.location}</span>
-                        </div>
-                        <h3 className="font-serif text-2xl font-medium mb-3">{work.title}</h3>
-                        <p className="text-neutral-400 text-sm leading-relaxed">{work.desc}</p>
-                      </div>
-                    </article>
-                  </FadeIn>
-                ))}
+                <dl className="case-brief"><div><dt>空き家期間</dt><dd>約5年</dd></div><div><dt>再生方針</dt><dd>残す部分と直す部分を見極める</dd></div><div><dt>現在の使われ方</dt><dd>一棟貸しの宿として活用</dd></div></dl>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Message Section */}
-        <section id="message" className="py-20 sm:py-32 bg-neutral-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <FadeIn>
-                <div className="relative aspect-[3/4] md:aspect-[4/5] rounded-2xl overflow-hidden shadow-xl">
-                  <img src={asset("/works/IMG_8612_1_resize.webp")} alt="Taketo Ikeda" loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:hidden"></div>
-                  <div className="absolute bottom-6 left-6 text-white md:hidden">
-                    <div className="text-xs opacity-80 mb-1">{t("代表取締役", "CEO")}</div>
-                    <div className="font-serif font-medium text-xl">池田 健虎</div>
-                  </div>
-                </div>
-              </FadeIn>
-              
-              <FadeIn delay={200}>
-                <div>
-                  <h2 className="font-serif font-medium text-3xl sm:text-4xl mb-8">{t("代表メッセージ", "Message")}</h2>
-                  
-                  <div className="prose prose-neutral text-neutral-600 leading-loose">
-                    <p className="mb-6">
-                      {t(
-                        "古くても、丁寧に手入れされてきた家には、静かな品と温かさがあります。私が生まれ育った実家は築40年以上ですが、今も手入れが行き届き、凛とした佇まいを保っています。",
-                        "Homes that have been carefully maintained—even as they age—carry a quiet dignity and warmth. My childhood home is over 40 years old, yet it stands proudly, well-kept and dignified."
-                      )}
-                    </p>
-                    <p className="mb-6">
-                      {t(
-                        "しかし、相続された古い家が、十分にメンテナンスされず、本来の魅力を発揮できていない場面に多く出会います。骨格のしっかりした家は、手をかければ、かつての美しさと現代の使い心地を取り戻せます。",
-                        "I often encounter inherited homes that have lost their shine due to lack of care. Yet, a house with good bones can regain its beauty and modern functionality with the right touch."
-                      )}
-                    </p>
-                    <p>
-                      {t(
-                        "空き家が増える今、私たちは古民家の素材と技を活かし、次の世代へ安心して受け渡せる住まいへ丁寧に再生していきます。",
-                        "As vacant homes increase, we are committed to honoring traditional materials and craftsmanship, carefully restoring homes to be passed on to the next generation."
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="mt-10 hidden md:block">
-                    <div className="text-sm text-neutral-500 mb-1">{t("代表取締役", "Representative Director")}</div>
-                    <div className="font-serif font-medium text-2xl">池田 健虎 <span className="text-lg text-neutral-400 ml-2 font-sans">Taketo Ikeda</span></div>
-                  </div>
-                </div>
-              </FadeIn>
+            <div className="case-lower">
+              <div className="case-brand-message">
+                <h3 className="case-brand-title"><span><span className="nowrap">売るか、</span> <span className="nowrap">壊すか。</span></span><span className="nowrap">その前に、</span><span>その家の<span className="nowrap">可能性を。</span></span></h3>
+                <p>残す部分と直す部分を見極め、<br />その家に合った新しい使われ方を考えます。</p>
+              </div>
+              <figure className="case-after"><Image src={siteConfig.images.afterLiving} alt="再生後の草花の家の明るいリビング" /><figcaption><strong>再生後</strong><span>古い造作を生かした現在のリビング</span></figcaption></figure>
             </div>
+            <div className="case-outcomes">
+              <article><span><b>01</b>残したもの</span><strong>古い建具、木の天井、柱、間取り、この家らしい佇まい</strong></article>
+              <article><span><b>02</b>代表自ら修繕したもの</span><strong>床、壁、柱、天井、キッチン、和室、階段、フローリング</strong></article>
+              <article><span><b>03</b>専門業者へ依頼したもの</span><strong>外壁工事、電気工事、給湯器・ガス設備、畳の表替え</strong></article>
+              <article><span><b>04</b>現在の使われ方</span><strong>家族や友人を迎える一棟貸しの宿</strong></article>
+            </div>
+            <div className="case-action"><a className="button outline" href={siteConfig.stayUrl} target="_blank" rel="noopener noreferrer">再生後の宿を見る <span aria-hidden="true">↗</span></a></div>
           </div>
         </section>
 
-        {/* Company Section */}
-        <section id="company" className="py-20 sm:py-32 bg-white border-y border-neutral-100">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <FadeIn>
-              <div className="text-center mb-16">
-                <h2 className="font-serif font-medium text-3xl sm:text-4xl mb-4">{t("会社概要", "Company")}</h2>
-                <div className="w-12 h-1 bg-brand mx-auto"></div>
-              </div>
-
-              <div className="grid sm:grid-cols-[1fr,2fr] border-t border-neutral-200">
-                {[
-                  [t("会社名", "Company Name"), "株式会社TigerWorks (TigerWorks Inc.)"],
-                  [t("設立", "Established"), "2025年6月4日"],
-                  [t("代表者", "Representative"), t("池田 健虎", "Taketo Ikeda")],
-                  [t("所在地", "Address"), t("〒196-0033 東京都昭島市福島町908-33", "908-33 Fukujimacho, Akishima, Tokyo, 196-0033 Japan")],
-                  [t("資本金", "Capital"), "480万円"],
-                  [t("事業内容", "Business"), t("不動産賃貸業 / リノベーション設計・施工 / 簡易宿所運営", "Real Estate Leasing / Renovation / Guesthouse Operations")],
-                  [t("取引銀行", "Bank"), "多摩信用金庫 / 住信SBIネット銀行"],
-                ].map(([label, value], i) => (
-                  <div key={i} className="contents group">
-                    <div className="py-4 sm:py-6 text-neutral-500 font-medium sm:border-b border-neutral-100 group-last:border-none">{label}</div>
-                    <div className="py-2 sm:py-6 text-neutral-900 border-b border-neutral-100 group-last:border-none">{value}</div>
-                  </div>
-                ))}
-              </div>
-            </FadeIn>
+        <section className="section values">
+          <div className="wide">
+            <div className="compact-heading"><p className="section-label">私たちの判断基準</p><h2>TigerWorksが大切にする<br />3つのこと。</h2></div>
+            <div className="values-grid">{values.map(([title, body], index) => <article key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{body}</p></article>)}</div>
+            <a className="text-link" href="/about.html">Mission・Vision・Valuesの詳細を見る →</a>
           </div>
         </section>
 
-        {/* Contact Section */}
-        <section id="contact" className="py-20 sm:py-32 bg-neutral-50">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-            <FadeIn>
-              <h2 className="font-serif font-medium text-3xl sm:text-4xl mb-4">{t("お問い合わせ", "Contact")}</h2>
-              <p className="text-neutral-600 mb-10">
-                {t(
-                  "リノベーションのご相談、物件活用のお悩みなど、お気軽にお問い合わせください。",
-                  "Please feel free to contact us regarding renovation consultations or property utilization inquiries."
-                )}
-              </p>
-              
-              <div className="bg-white p-1 rounded-2xl shadow-sm border border-neutral-200 overflow-hidden">
-                <iframe
-                  title="contact-form"
-                  src="https://forms.gle/CC3BTBAhBMWgQ7HE8"
-                  className="w-full h-[600px] rounded-xl"
-                  frameBorder="0"
-                  marginHeight="0"
-                  marginWidth="0"
-                >
-                  読み込んでいます…
-                </iframe>
-              </div>
-
-              <p className="mt-8 text-sm text-neutral-600">
-                {t("フォームが表示されない場合は、メールでもお気軽にどうぞ。", "If the form doesn't load, feel free to email us directly.")}
-              </p>
-              <a
-                href="mailto:info@tiger-works.jp"
-                className="mt-2 inline-flex items-center gap-2 text-neutral-900 font-medium hover:text-brand hover:gap-3 transition-all"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                </svg>
-                info@tiger-works.jp
-              </a>
-            </FadeIn>
+        <section className="section flow-section">
+          <div className="wide">
+            <div className="compact-heading"><p className="section-label">ご相談の流れ</p><h2>決まっていない状態から、<br />順番に整理します。</h2></div>
+            <div className="flow-list">{flow.map(([no, title, body]) => <article key={no}><span>{no}</span><div><h3>{title}</h3><p>{body}</p></div></article>)}</div>
+            <p className="flow-note">初回相談は無料です。物件の状況と支援範囲に応じて、その後のお見積もりをご案内します。</p>
           </div>
         </section>
 
+        <section id="partners" className="section partners">
+          <div className="wide partner-grid">
+            <div><p className="section-label light">専門家・紹介パートナーの方へ</p><h2>相続した家に悩むお客様へ、<br />もう一つの選択肢を。</h2></div>
+            <div><p>税理士、司法書士、不動産会社、遺品整理会社、空き家管理会社の皆様へ。TigerWorksは専門家の業務領域を尊重し、税務、登記、法律判断を代行しません。</p><p>建物の現況、活用可能性、必要改修、運営可能性、概算収支を整理し、ご本人が意思決定できる材料を提供します。民泊が向かない場合には無理に勧めません。</p><a className="button light-button" href="#contact">空き家の活用を相談する</a></div>
+          </div>
+        </section>
+
+        <section id="company" className="section company">
+          <div className="narrow">
+            <p className="section-label">会社概要・代表者情報</p><h2>運営会社について。</h2>
+            <dl>{[["会社名", "株式会社TigerWorks"], ["設立", "2025年6月4日"], ["代表者", "代表取締役　池田 健虎"], ["所在地", "〒196-0033 東京都昭島市福島町908-33"], ["資本金", "480万円"], ["事業内容", "不動産賃貸業／古民家・築古戸建ての活用支援／民泊・宿泊施設の開業支援"]].map(([dt, dd]) => <div key={dt}><dt>{dt}</dt><dd>{dd}</dd></div>)}</dl>
+            <div className="pricing"><h3>ご相談費用について</h3>{siteConfig.pricingVisible ? <><p>料金の目安です。正式なお見積もりは現地確認後にご案内します。</p><ul>{siteConfig.pricing.map((item) => <li key={item.name}><span>{item.name}</span><strong>{item.price}</strong></li>)}</ul></> : <p>物件の状況と支援範囲に応じてお見積もりします。まずは無料相談で状況をお聞かせください。</p>}</div>
+          </div>
+        </section>
+
+        <section id="contact" className="section contact">
+          <div className="narrow">
+            <p className="section-label light">お問い合わせ</p>
+            <h2 className="contact-title"><span>売るか、壊すか。</span><span><span className="contact-before">その前に、</span><span className="contact-possibility">その家の可能性を</span></span><span className="contact-final-line">一緒に考えませんか。</span></h2>
+            <p>民泊や賃貸など、活用方法が決まっていない段階でもご相談いただけます。</p>
+            <a className="button contact-button" href={siteConfig.contactFormUrl} target="_blank" rel="noopener noreferrer" onClick={openForm}>空き家の活用を相談する <span aria-hidden="true">↗</span></a>
+            {notice && <p className="form-notice" role="status">{notice}</p>}
+            <p className="contact-note">お問い合わせは専用フォームより受け付けています。</p>
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-neutral-900 text-white pt-16 pb-24 md:pb-12 border-t border-neutral-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid gap-10 md:grid-cols-3">
-            {/* ロゴ + 一文 */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <img src={asset('/works/logo_silver_bright.webp')} alt="Logo" loading="lazy" decoding="async" className="w-8 h-8 object-contain" />
-                <span className="font-serif font-bold tracking-wide">TigerWorks Inc.</span>
-              </div>
-              <p className="text-sm text-neutral-400 leading-relaxed">
-                {t("古き良きものを、次代へ。", "Reviving tradition for the future.")}
-              </p>
-            </div>
-
-            {/* サイト内ナビ + 民泊予約 */}
-            <nav className="flex flex-col gap-2" aria-label={t("フッターナビ", "Footer navigation")}>
-              {nav.map((n) => (
-                <a key={n.id} href={`#${n.id}`} className="text-sm text-neutral-400 hover:text-white transition-colors w-fit">
-                  {n.label}
-                </a>
-              ))}
-              <a
-                href="https://stay.tiger-works.jp/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-neutral-400 hover:text-white transition-colors w-fit"
-              >
-                {t("民泊予約（Tiger House）", "Stay (Tiger House)")}
-              </a>
-            </nav>
-
-            {/* 会社情報 */}
-            <div className="text-sm text-neutral-400 leading-relaxed">
-              <div className="font-serif font-medium text-neutral-200 mb-3">{t("株式会社TigerWorks", "TigerWorks Inc.")}</div>
-              <p className="mb-2">{t("〒196-0033 東京都昭島市福島町908-33", "908-33 Fukujimacho, Akishima, Tokyo, 196-0033 Japan")}</p>
-              <a href="mailto:info@tiger-works.jp" className="hover:text-white transition-colors">info@tiger-works.jp</a>
-            </div>
-          </div>
-
-          <div className="mt-12 pt-8 border-t border-neutral-800 text-xs text-neutral-500 text-center">
-            &copy; {new Date().getFullYear()} TigerWorks Inc. All rights reserved.
-          </div>
+      <footer>
+        <div className="wide footer-grid">
+          <div><img src="/works/logo_silver_bright.webp" alt="" width="42" height="42" /><strong>TigerWorks</strong><p>愛された家を、次の世代へ。</p></div>
+          <nav aria-label="フッターナビゲーション">{nav.map(([href, label]) => <a key={href} href={href}>{label}</a>)}<a href="#contact">お問い合わせ</a><a href="/privacy.html">プライバシーポリシー</a></nav>
+          <div><p>株式会社TigerWorks<br />東京都昭島市福島町908-33</p></div>
         </div>
+        <div className="copyright">© {new Date().getFullYear()} TigerWorks Inc.</div>
       </footer>
-
-      {/* Mobile Fixed CTA */}
-      <div
-        className={`md:hidden fixed inset-x-0 bottom-0 z-40 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-white/90 backdrop-blur-md border-t border-neutral-200 transition-all duration-300 ${
-          showMobileCTA ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
-        }`}
-        aria-hidden={!showMobileCTA}
-      >
-        <a
-          href="#contact"
-          className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-brand text-white rounded-full font-medium shadow-lg active:bg-brand-dark transition-colors"
-          tabIndex={showMobileCTA ? 0 : -1}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-          </svg>
-          {t("お問い合わせ", "Contact Us")}
-        </a>
-      </div>
+      <a className="mobile-cta" href="#contact">空き家の活用を相談する</a>
     </div>
   );
 }

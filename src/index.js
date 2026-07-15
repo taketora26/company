@@ -4,4 +4,5 @@ import './index.css';
 import App from './App';
 
 const root = createRoot(document.getElementById('root'));
+document.getElementById('root').textContent = '';
 root.render(<App />);

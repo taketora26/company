@@ -1,8 +1,13 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 
-const root = createRoot(document.getElementById('root'));
-document.getElementById('root').textContent = '';
-root.render(<App />);
+const rootElement = document.getElementById('root');
+
+if (rootElement.dataset.prerendered === 'true') {
+  hydrateRoot(rootElement, <App />);
+} else {
+  rootElement.textContent = '';
+  createRoot(rootElement).render(<App />);
+}

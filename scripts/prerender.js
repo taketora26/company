@@ -12,7 +12,7 @@ const sourceRoot = path.resolve(__dirname, '..', 'src');
 const Module = require('module');
 const originalResolveFilename = Module._resolveFilename;
 Module._resolveFilename = function (request, ...args) {
-  if (request.startsWith('@babel/runtime/helpers/esm/')) {
+  if (request.includes('@babel/runtime/helpers/esm/')) {
     request = request.replace('@babel/runtime/helpers/esm/', '@babel/runtime/helpers/');
   }
   return originalResolveFilename.call(this, request, ...args);

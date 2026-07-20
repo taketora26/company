@@ -9,6 +9,15 @@ const { renderToString } = require('react-dom/server');
 
 const sourceRoot = path.resolve(__dirname, '..', 'src');
 
+const Module = require('module');
+const originalResolveFilename = Module._resolveFilename;
+Module._resolveFilename = function (request, ...args) {
+  if (request.startsWith('@babel/runtime/helpers/esm/')) {
+    request = request.replace('@babel/runtime/helpers/esm/', '@babel/runtime/helpers/');
+  }
+  return originalResolveFilename.call(this, request, ...args);
+};
+
 for (const extension of ['.js', '.jsx']) {
   require.extensions[extension] = (module, filename) => {
     if (!filename.startsWith(sourceRoot)) {
